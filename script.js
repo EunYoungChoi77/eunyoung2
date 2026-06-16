@@ -109,8 +109,35 @@ nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
   menuButton.setAttribute('aria-expanded', 'false');
 }));
 
+const glow = document.querySelector('.cursor-glow');
+const pointer = { x: -500, y: -500 };
+const follower = { x: -500, y: -500 };
+
+function animateCursor() {
+  follower.x += (pointer.x - follower.x) * 0.16;
+  follower.y += (pointer.y - follower.y) * 0.16;
+  glow.style.left = `${follower.x}px`;
+  glow.style.top = `${follower.y}px`;
+  requestAnimationFrame(animateCursor);
+}
+
 document.addEventListener('pointermove', event => {
-  const glow = document.querySelector('.cursor-glow');
-  glow.style.left = `${event.clientX}px`;
-  glow.style.top = `${event.clientY}px`;
+  if (event.pointerType === 'touch') return;
+  pointer.x = event.clientX;
+  pointer.y = event.clientY;
+  glow.classList.add('visible');
 });
+
+document.addEventListener('pointerover', event => {
+  if (event.target.closest('a, button, .project-card')) glow.classList.add('interactive');
+});
+
+document.addEventListener('pointerout', event => {
+  if (event.target.closest('a, button, .project-card')) glow.classList.remove('interactive');
+});
+
+document.addEventListener('pointerdown', () => glow.classList.add('clicking'));
+document.addEventListener('pointerup', () => glow.classList.remove('clicking'));
+document.addEventListener('mouseleave', () => glow.classList.remove('visible'));
+
+animateCursor();
