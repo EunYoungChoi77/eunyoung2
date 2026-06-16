@@ -1,0 +1,116 @@
+const projects = {
+  fininvai: {
+    index: '01',
+    title: 'FinInvAI',
+    kicker: 'WEB SERVICE DESIGN · 2025.12—2026.03',
+    heading: '데이터를 보는 것에서, 받는 경험으로.',
+    summary: '분산된 시장 데이터를 하나의 흐름으로 연결하고 AI 기반 인사이트를 통해 사용자가 탐색보다 이해에 집중하도록 설계한 금융 데이터 서비스입니다.',
+    facts: [
+      ['Project', 'Team project · Design contribution 100%'],
+      ['Role', 'Logo · Web Landing UI · Icon Design'],
+      ['Tools', 'Figma · Illustrator · Photoshop · Gemini']
+    ],
+    pages: [
+      ['assets/images/portfolio-2.webp', 'FinInvAI Overview'],
+      ['assets/images/portfolio-3.webp', 'Project Goal'],
+      ['assets/images/portfolio-4.webp', 'AI-driven Insight'],
+      ['assets/images/portfolio-5.webp', 'Main Screen Overview'],
+      ['assets/images/portfolio-6.webp', 'Dashboard Features']
+    ]
+  },
+  sorijang: {
+    index: '02',
+    title: '소리장',
+    kicker: 'MUSIC APP DESIGN · 2025.09—2025.12',
+    heading: '감정과 상황에서 시작하는 음악 탐색.',
+    summary: '세분화된 음악 선택 리스트와 AI 채팅 기반 추천 기능을 통해 사용자가 자신의 감정과 상황에 맞는 음악을 쉽고 직관적으로 발견하도록 설계했습니다.',
+    facts: [
+      ['Project', '3-person team · Contribution 70%'],
+      ['Role', 'Logo · UX Structure · UI · Concept Planning'],
+      ['Tools', 'Figma · Illustrator · Photoshop · Gemini']
+    ],
+    pages: [
+      ['assets/images/portfolio-7.webp', 'Sorijang Overview'],
+      ['assets/images/portfolio-8.webp', 'Project Goal'],
+      ['assets/images/portfolio-9.webp', 'Feature Screen']
+    ]
+  }
+};
+
+const modal = document.querySelector('#project-modal');
+const closeButton = document.querySelector('.modal-close');
+let lastFocused = null;
+
+function openProject(key) {
+  const p = projects[key];
+  if (!p) return;
+  lastFocused = document.activeElement;
+  document.querySelector('#modal-index').textContent = p.index;
+  document.querySelector('#modal-title').textContent = p.title;
+  document.querySelector('#modal-kicker').textContent = p.kicker;
+  document.querySelector('#modal-heading').textContent = p.heading;
+  document.querySelector('#modal-summary').textContent = p.summary;
+  document.querySelector('#modal-facts').innerHTML = p.facts.map(([label, value]) =>
+    `<div><span>${label}</span><strong>${value}</strong></div>`
+  ).join('');
+  document.querySelector('#modal-gallery').innerHTML = p.pages.map(([src, caption]) =>
+    `<figure><img src="${src}" alt="${caption}" loading="lazy"><figcaption>${caption}</figcaption></figure>`
+  ).join('');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+  modal.scrollTop = 0;
+  setTimeout(() => closeButton.focus(), 150);
+}
+
+function closeProject() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
+  if (lastFocused) lastFocused.focus();
+}
+
+document.querySelectorAll('.project-card').forEach(card => {
+  card.addEventListener('click', () => openProject(card.dataset.project));
+  card.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openProject(card.dataset.project);
+    }
+  });
+});
+closeButton.addEventListener('click', closeProject);
+modal.addEventListener('click', event => {
+  if (event.target === modal) closeProject();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && modal.classList.contains('open')) closeProject();
+});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.13 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const menuButton = document.querySelector('.menu-button');
+const nav = document.querySelector('.nav');
+menuButton.addEventListener('click', () => {
+  const isOpen = nav.classList.toggle('open');
+  menuButton.setAttribute('aria-expanded', String(isOpen));
+  menuButton.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
+});
+nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  nav.classList.remove('open');
+  menuButton.setAttribute('aria-expanded', 'false');
+}));
+
+document.addEventListener('pointermove', event => {
+  const glow = document.querySelector('.cursor-glow');
+  glow.style.left = `${event.clientX}px`;
+  glow.style.top = `${event.clientY}px`;
+});
